@@ -31,6 +31,37 @@ function Services({ onNavigate, verificationData = {} }) {
     }
   }, [showTransactionSuccess]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      // Check if Alt key is pressed
+      if (event.altKey) {
+        switch (event.key.toLowerCase()) {
+          case 'd':
+            event.preventDefault();
+            // Navigate to duplicate RC
+            handleServiceSelection('duplicateRC');
+            break;
+          case 'p':
+            event.preventDefault();
+            // Navigate to pay tax
+            handleServiceSelection('tax');
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('keydown', handleKeyDown);
+
+    // Cleanup event listener on component unmount
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onNavigate, vehicleNumber]);
+
   const services = [
     {
       id: 'tax',
@@ -46,7 +77,8 @@ function Services({ onNavigate, verificationData = {} }) {
       cardClass: 'tax-card',
       btnClass: 'tax-btn',
       btnText: 'Proceed to Pay Tax',
-      keywords: ['tax', 'road tax', 'payment', 'pay', 'vehicle tax', 'online tax']
+      keywords: ['tax', 'road tax', 'payment', 'pay', 'vehicle tax', 'online tax'],
+      shortcut: 'Alt+P'
     },
     {
       id: 'duplicateRC',
@@ -62,7 +94,8 @@ function Services({ onNavigate, verificationData = {} }) {
       cardClass: 'rc-card',
       btnClass: 'rc-btn',
       btnText: 'Apply for Duplicate RC',
-      keywords: ['rc', 'registration', 'certificate', 'duplicate', 'apply', 'registration certificate']
+      keywords: ['rc', 'registration', 'certificate', 'duplicate', 'apply', 'registration certificate'],
+      shortcut: 'Alt+D'
     }
   ];
 
@@ -251,12 +284,18 @@ function Services({ onNavigate, verificationData = {} }) {
                       key={service.id}
                       className={`service-card ${service.cardClass}`}
                       onClick={() => handleServiceSelection(service.id)}
+                      title={`${service.shortcut} - ${service.title}`}
                     >
                       <div className="card-icon">
                         <ServiceIcon><IconComponent /></ServiceIcon>
                       </div>
                       <div className="card-content">
-                        <h2>{service.title}</h2>
+                        <div className="card-header">
+                          <h2>{service.title}</h2>
+                          {service.shortcut && (
+                            <span className="service-shortcut">{service.shortcut}</span>
+                          )}
+                        </div>
                         <p>{service.description}</p>
                         <ul className="service-features">
                           {service.features.map((feature, index) => (

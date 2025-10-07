@@ -84,6 +84,19 @@
   margin-left: 0.25rem;
 }
 
+.keyboard-shortcut {
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.8;
+  background-color: rgba(30, 60, 114, 0.1);
+  color: #1e3c72;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(30, 60, 114, 0.2);
+  margin-left: 0.5rem;
+}
+
 /* Transaction History Overlay */
 .history-overlay {
   position: fixed;
@@ -351,6 +364,12 @@
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
 }
 
+.service-card:hover .service-shortcut {
+  background: rgba(30, 60, 114, 0.15);
+  border-color: rgba(30, 60, 114, 0.3);
+  transform: scale(1.05);
+}
+
 .card-icon {
   margin-bottom: 1.5rem;
 }
@@ -379,19 +398,63 @@
   margin-bottom: 1.5rem;
 }
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
 .card-content h2 {
-  margin: 0 0 1rem 0;
+  margin: 0;
   font-size: 1.75rem;
   color: #1e3c72;
   font-weight: 700;
+  flex: 1;
+}
+
+.service-shortcut {
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(30, 60, 114, 0.1);
+  color: #1e3c72;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(30, 60, 114, 0.2);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .tax-card .card-content h2 {
   color: #2e7d32;
 }
 
+.tax-card .service-shortcut {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2e7d32;
+  border-color: rgba(46, 125, 50, 0.2);
+}
+
+.tax-card:hover .service-shortcut {
+  background: rgba(46, 125, 50, 0.15);
+  border-color: rgba(46, 125, 50, 0.3);
+}
+
 .rc-card .card-content h2 {
   color: #1565c0;
+}
+
+.rc-card .service-shortcut {
+  background: rgba(21, 101, 192, 0.1);
+  color: #1565c0;
+  border-color: rgba(21, 101, 192, 0.2);
+}
+
+.rc-card:hover .service-shortcut {
+  background: rgba(21, 101, 192, 0.15);
+  border-color: rgba(21, 101, 192, 0.3);
 }
 
 .card-content p {
@@ -677,6 +740,26 @@
     align-self: flex-end;
     padding: 0.625rem 1.25rem;
     font-size: 0.9rem;
+  }
+
+  .keyboard-shortcut {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .service-shortcut {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .service-shortcut {
+    align-self: flex-end;
   }
 
   .history-badge {

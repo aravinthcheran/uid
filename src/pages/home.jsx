@@ -52,6 +52,7 @@ function App({ onNavigate }) {
   const [vehicleNumber, setVehicleNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [vehicleNumberError, setVehicleNumberError] = useState('');
 
   const states = [
     'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -72,10 +73,66 @@ function App({ onNavigate }) {
     'West Bengal': ['WB01 - Kolkata Central', 'WB02 - Kolkata South', 'WB03 - Kolkata North', 'WB04 - Howrah', 'WB06 - Siliguri', 'WB07 - Asansol', 'WB10 - Durgapur', 'WB19 - Kalyani']
   };
 
+  // Vehicle registration number validation function
+  const validateVehicleNumber = (vehicleNum) => {
+    if (!vehicleNum) {
+      return 'Vehicle registration number is required.';
+    }
+
+    // Remove spaces and convert to uppercase
+    const cleanedNumber = vehicleNum.replace(/\s/g, '').toUpperCase();
+
+    // Check length - should be exactly 10 characters
+    if (cleanedNumber.length !== 10) {
+      return 'Vehicle registration number must be exactly 10 characters long.';
+    }
+
+    // Indian vehicle registration number format: XX##XX####
+    // 2 letters + 2 digits + 2 letters + 4 digits (e.g., TN01AB1234)
+    const pattern = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+
+    if (!pattern.test(cleanedNumber)) {
+      return 'Invalid vehicle registration format. Please use format: TN01AB1234';
+    }
+
+    // Check for valid state codes (first 2 letters)
+    const validStateCodes = [
+      'AP', 'AR', 'AS', 'BR', 'CG', 'GA', 'GJ', 'HR', 'HP', 'JK', 'JH', 'KA',
+      'KL', 'LA', 'MP', 'MH', 'MN', 'ML', 'MZ', 'NL', 'OR', 'PB', 'RJ', 'SK',
+      'TN', 'TS', 'TR', 'UP', 'UK', 'WB', 'AN', 'CH', 'DN', 'DL', 'LD', 'PY'
+    ];
+
+    const stateCode = cleanedNumber.substring(0, 2);
+    if (!validStateCodes.includes(stateCode)) {
+      return `Invalid state code "${stateCode}". Please enter a valid Indian state code.`;
+    }
+
+    // Check RTO code (digits after state code)
+    const rtoCode = cleanedNumber.substring(2, 4);
+    if (!/^[0-9]{2}$/.test(rtoCode) || rtoCode === '00') {
+      return 'Invalid RTO code. RTO code should be a valid 2-digit number (01-99).';
+    }
+
+    return ''; // No error
+  };
+
   const handleVehicleNumberChange = (e) => {
-    // Allow only alphanumeric characters and limit length
-    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    // Allow only alphanumeric characters and spaces
+    const value = e.target.value.toUpperCase().replace(/[^A-Z0-9\s]/g, '');
     setVehicleNumber(value);
+    
+    // Clear error when user starts typing
+    if (vehicleNumberError) {
+      setVehicleNumberError('');
+    }
+  };
+
+  const handleVehicleNumberBlur = () => {
+    // Validate on blur (when user leaves the input field)
+    if (vehicleNumber.trim()) {
+      const error = validateVehicleNumber(vehicleNumber);
+      setVehicleNumberError(error);
+    }
   };
 
   const handleQuickAction = (actionType) => {
@@ -91,6 +148,14 @@ function App({ onNavigate }) {
     if (searchMode === 'vehicle') {
       if (!vehicleNumber) {
         setModalMessage('Please enter your vehicle registration number.');
+        return;
+      }
+      
+      // Validate vehicle number before proceeding
+      const validationError = validateVehicleNumber(vehicleNumber);
+      if (validationError) {
+        setVehicleNumberError(validationError);
+        setModalMessage('Please correct the vehicle registration number format before proceeding.');
         return;
       }
     } else {
@@ -112,7 +177,7 @@ function App({ onNavigate }) {
       const verifiedInfo = searchMode === 'vehicle' ? vehicleNumber : `${selectedRTO}, ${selectedState}`;
       // Navigate to services page
       onNavigate('services', { 
-        vehicleNumber: searchMode === 'vehicle' ? vehicleNumber : '',
+        vehicleNumber: searchMode === 'vehicle' ? vehicleNumber.replace(/\s/g, '').toUpperCase() : '',
         location: searchMode === 'location' ? verifiedInfo : ''
       });
     }, 2000);
@@ -142,6 +207,7 @@ function App({ onNavigate }) {
                     setSearchMode('vehicle');
                     setSelectedState('');
                     setSelectedRTO('');
+                    setVehicleNumberError('');
                   }}
                 >
                   Search by Vehicle Number
@@ -151,6 +217,7 @@ function App({ onNavigate }) {
                   onClick={() => {
                     setSearchMode('location');
                     setVehicleNumber('');
+                    setVehicleNumberError('');
                   }}
                 >
                   Search by Location
@@ -165,11 +232,19 @@ function App({ onNavigate }) {
                     id="vehicle-number"
                     value={vehicleNumber}
                     onChange={handleVehicleNumberChange}
+                    onBlur={handleVehicleNumberBlur}
                     placeholder="e.g. TN01AB1234"
-                    className="form-input"
-                    maxLength="15"
+                    className={`form-input ${vehicleNumberError ? 'error' : ''}`}
+                    maxLength="10"
                   />
-                  <small className="form-help">Enter your complete vehicle registration number</small>
+                  {vehicleNumberError && (
+                    <div className="error-message">
+                      {vehicleNumberError}
+                    </div>
+                  )}
+                  <small className="form-help">
+                    Enter your complete vehicle registration number (format: TN01AB1234)
+                  </small>
                 </div>
               ) : (
                 <>
