@@ -23,6 +23,7 @@ function DuplicateRC({ onNavigate, initialVehicleNumber = '', initialData = {} }
   const [isLoading, setIsLoading] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [ownerDetails, setOwnerDetails] = useState(initialData.ownerDetails || null);
+  const hasPrefilledVehicleNumber = !!(initialData.vehicleNumber || initialVehicleNumber); // Track if vehicle number came from previous page
 
   const handleVehicleNumberChange = (e) => {
     const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -144,21 +145,40 @@ function DuplicateRC({ onNavigate, initialVehicleNumber = '', initialData = {} }
               </div>
               <div className="form-body">
                 <form onSubmit={handleVerify}>
-                  <div className="form-group">
-                    <label htmlFor="vehicle-number">
-                      Vehicle Registration No. <span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="vehicle-number"
-                      value={vehicleNumber}
-                      onChange={handleVehicleNumberChange}
-                      className="form-input"
-                      placeholder="Enter vehicle registration number"
-                      maxLength="15"
-                      required
-                    />
-                  </div>
+                  {hasPrefilledVehicleNumber && (
+                    <div className="form-group">
+                      <label htmlFor="vehicle-number">
+                        Vehicle Registration No. <span className="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="vehicle-number"
+                        value={vehicleNumber}
+                        className="form-input prefilled-input"
+                        readOnly
+                        title="Vehicle number from your search"
+                      />
+                      <p className="prefilled-note">✓ Vehicle number from your search</p>
+                    </div>
+                  )}
+                  
+                  {!hasPrefilledVehicleNumber && (
+                    <div className="form-group">
+                      <label htmlFor="vehicle-number">
+                        Vehicle Registration No. <span className="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="vehicle-number"
+                        value={vehicleNumber}
+                        onChange={handleVehicleNumberChange}
+                        className="form-input"
+                        placeholder="Enter vehicle registration number"
+                        maxLength="15"
+                        required
+                      />
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label htmlFor="chassis-number">
@@ -182,6 +202,14 @@ function DuplicateRC({ onNavigate, initialVehicleNumber = '', initialData = {} }
                     disabled={isLoading}
                   >
                     {isLoading ? 'VERIFYING...' : 'VERIFY & PROCEED'}
+                  </button>
+                  
+                  <button 
+                    type="button"
+                    className="back-to-services-btn"
+                    onClick={() => onNavigate('services', { vehicleNumber })}
+                  >
+                    ← Back to Services
                   </button>
                 </form>
 

@@ -24,6 +24,7 @@ function TaxPayment({ onNavigate, initialData = {} }) {
   const [modalMessage, setModalMessage] = useState('');
   const [vehicleDetails, setVehicleDetails] = useState(initialData.vehicleDetails || null);
   const [taxDetails, setTaxDetails] = useState(initialData.taxDetails || null);
+  const hasPrefilledVehicleNumber = !!initialData.vehicleNumber; // Track if vehicle number came from previous page
 
   const handleVehicleNumberChange = (e) => {
     // Allow only alphanumeric characters and convert to uppercase
@@ -161,21 +162,40 @@ function TaxPayment({ onNavigate, initialData = {} }) {
               </div>
               <div className="form-body">
                 <form onSubmit={handleVerify}>
-                  <div className="form-group">
-                    <label htmlFor="vehicle-number">
-                      Vehicle Registration No. <span className="required">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="vehicle-number"
-                      value={vehicleNumber}
-                      onChange={handleVehicleNumberChange}
-                      className="form-input"
-                      placeholder="Enter vehicle registration number"
-                      maxLength="15"
-                      required
-                    />
-                  </div>
+                  {hasPrefilledVehicleNumber && (
+                    <div className="form-group">
+                      <label htmlFor="vehicle-number">
+                        Vehicle Registration No. <span className="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="vehicle-number"
+                        value={vehicleNumber}
+                        className="form-input prefilled-input"
+                        readOnly
+                        title="Vehicle number from your search"
+                      />
+                      <p className="prefilled-note">✓ Vehicle number from your search</p>
+                    </div>
+                  )}
+                  
+                  {!hasPrefilledVehicleNumber && (
+                    <div className="form-group">
+                      <label htmlFor="vehicle-number">
+                        Vehicle Registration No. <span className="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        id="vehicle-number"
+                        value={vehicleNumber}
+                        onChange={handleVehicleNumberChange}
+                        className="form-input"
+                        placeholder="Enter vehicle registration number"
+                        maxLength="15"
+                        required
+                      />
+                    </div>
+                  )}
 
                   <div className="form-group">
                     <label htmlFor="chassis-number">
@@ -200,12 +220,22 @@ function TaxPayment({ onNavigate, initialData = {} }) {
                   >
                     {isLoading ? 'VERIFYING...' : 'VERIFY & CHECK TAX'}
                   </button>
+                  
+                  <button 
+                    type="button"
+                    className="back-to-services-btn"
+                    onClick={() => onNavigate('services', { vehicleNumber })}
+                  >
+                    ← Back to Services
+                  </button>
                 </form>
 
                 <div className="help-section">
                   <h4>Important Instructions:</h4>
                   <ul>
-                    <li>Enter your complete vehicle registration number without spaces</li>
+                    {!hasPrefilledVehicleNumber && (
+                      <li>Enter your complete vehicle registration number without spaces</li>
+                    )}
                     <li>Chassis number should be last 5 characters only</li>
                     <li>Make sure to verify all details before proceeding</li>
                     <li>For any issues, please contact your nearest RTO office</li>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/services.css';
 import Header from '../components/Header';
 
@@ -14,8 +14,67 @@ const TaxIcon = () => (
 );
 
 function Services({ onNavigate, verificationData = {} }) {
-  const { vehicleNumber = '', location = '' } = verificationData;
+  const { vehicleNumber = '', location = '', showTransactionSuccess = false } = verificationData;
   const displayInfo = vehicleNumber || location || 'your selection';
+  const [searchTerm, setSearchTerm] = useState('');
+  const [transactions, setTransactions] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    // Load transactions from localStorage
+    const savedTransactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+    setTransactions(savedTransactions);
+    
+    // Show success message if redirected from payment
+    if (showTransactionSuccess && savedTransactions.length > 0) {
+      // Could add a toast/notification here
+    }
+  }, [showTransactionSuccess]);
+
+  const services = [
+    {
+      id: 'tax',
+      title: 'Pay Your Tax',
+      description: 'Pay road tax for your vehicle online quickly and securely',
+      features: [
+        '✓ Quick payment process',
+        '✓ Multiple payment options',
+        '✓ Instant receipt generation',
+        '✓ Transaction tracking'
+      ],
+      icon: TaxIcon,
+      cardClass: 'tax-card',
+      btnClass: 'tax-btn',
+      btnText: 'Proceed to Pay Tax',
+      keywords: ['tax', 'road tax', 'payment', 'pay', 'vehicle tax', 'online tax']
+    },
+    {
+      id: 'duplicateRC',
+      title: 'Apply for Duplicate RC',
+      description: 'Get a duplicate registration certificate for your vehicle',
+      features: [
+        '✓ Easy application process',
+        '✓ Home delivery available',
+        '✓ Track application status',
+        '✓ Secure payment gateway'
+      ],
+      icon: CarIcon,
+      cardClass: 'rc-card',
+      btnClass: 'rc-btn',
+      btnText: 'Apply for Duplicate RC',
+      keywords: ['rc', 'registration', 'certificate', 'duplicate', 'apply', 'registration certificate']
+    }
+  ];
+
+  const filteredServices = services.filter(service => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      service.title.toLowerCase().includes(search) ||
+      service.description.toLowerCase().includes(search) ||
+      service.keywords.some(keyword => keyword.includes(search))
+    );
+  });
 
   const handleServiceSelection = (service) => {
     if (service === 'tax') {
@@ -40,7 +99,53 @@ function Services({ onNavigate, verificationData = {} }) {
         <section className="services-hero">
           <div className="services-container">
             <div className="services-header">
-              <h1>Available Services</h1>
+              <div className="header-top">
+                <h1>Available Services</h1>
+                
+                {/* Transaction History Button */}
+                {transactions.length > 0 && (
+                  <button 
+                    className="transaction-history-btn"
+                    onClick={() => setShowHistory(!showHistory)}
+                    title="View Transaction History"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 3v5h5"/>
+                      <path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/>
+                      <path d="M12 7v5l4 2"/>
+                    </svg>
+                    <span className="history-text">History</span>
+                    <span className="history-badge">{transactions.length}</span>
+                  </button>
+                )}
+              </div>
+              
+              {/* Search Bar */}
+              <div className="search-container">
+                <div className="search-wrapper">
+                  <svg className="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                  <input
+                    type="text"
+                    className="search-input"
+                    placeholder="Search for services (e.g., tax, RC, registration...)"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  {searchTerm && (
+                    <button 
+                      className="clear-search-btn"
+                      onClick={() => setSearchTerm('')}
+                      aria-label="Clear search"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <p className="verification-info">
                 {vehicleNumber && (
                   <>
@@ -57,52 +162,131 @@ function Services({ onNavigate, verificationData = {} }) {
               </p>
             </div>
 
-            <div className="services-grid">
-              <div 
-                className="service-card tax-card"
-                onClick={() => handleServiceSelection('tax')}
-              >
-                <div className="card-icon">
-                  <ServiceIcon><TaxIcon /></ServiceIcon>
+            {/* Transaction History Modal/Dropdown */}
+            {showHistory && transactions.length > 0 && (
+              <>
+                <div 
+                  className="history-overlay"
+                  onClick={() => setShowHistory(false)}
+                />
+                <div className="transaction-history-modal">
+                <div className="history-modal-header">
+                  <h3>Transaction History</h3>
+                  <button 
+                    className="close-history-btn"
+                    onClick={() => setShowHistory(false)}
+                    aria-label="Close history"
+                  >
+                    ×
+                  </button>
                 </div>
-                <div className="card-content">
-                  <h2>Pay Your Tax</h2>
-                  <p>Pay road tax for your vehicle online quickly and securely</p>
-                  <ul className="service-features">
-                    <li>✓ Quick payment process</li>
-                    <li>✓ Multiple payment options</li>
-                    <li>✓ Instant receipt generation</li>
-                    <li>✓ Transaction tracking</li>
-                  </ul>
+                
+                <div className="transaction-history-content">
+                  <div className="transaction-table-wrapper">
+                    <table className="transaction-table">
+                      <thead>
+                        <tr>
+                          <th>Date & Time</th>
+                          <th>Transaction ID</th>
+                          <th>Service</th>
+                          <th>Vehicle Number</th>
+                          <th>Amount</th>
+                          <th>Payment Method</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {transactions.map((txn, index) => (
+                          <tr key={txn.id || index}>
+                            <td>{new Date(txn.date).toLocaleString('en-IN', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}</td>
+                            <td className="txn-id">{txn.id}</td>
+                            <td>{txn.serviceType}</td>
+                            <td className="vehicle-number">{txn.vehicleNumber}</td>
+                            <td className="amount">₹{txn.amount}</td>
+                            <td>{txn.paymentMethod}</td>
+                            <td>
+                              <span className={`status-badge status-${txn.status.toLowerCase()}`}>
+                                {txn.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  {transactions.length >= 20 && (
+                    <p className="history-note">Showing last 20 transactions</p>
+                  )}
+                  
+                  <button 
+                    className="clear-history-btn"
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to clear all transaction history?')) {
+                        localStorage.removeItem('transactions');
+                        setTransactions([]);
+                        setShowHistory(false);
+                      }
+                    }}
+                  >
+                    Clear History
+                  </button>
                 </div>
-                <button className="service-btn tax-btn">
-                  Proceed to Pay Tax
-                  <span className="arrow">→</span>
-                </button>
               </div>
+              </>
+            )}
 
-              <div 
-                className="service-card rc-card"
-                onClick={() => handleServiceSelection('duplicateRC')}
-              >
-                <div className="card-icon">
-                  <ServiceIcon><CarIcon /></ServiceIcon>
+            <div className="services-grid">
+              {filteredServices.length > 0 ? (
+                filteredServices.map((service) => {
+                  const IconComponent = service.icon;
+                  return (
+                    <div 
+                      key={service.id}
+                      className={`service-card ${service.cardClass}`}
+                      onClick={() => handleServiceSelection(service.id)}
+                    >
+                      <div className="card-icon">
+                        <ServiceIcon><IconComponent /></ServiceIcon>
+                      </div>
+                      <div className="card-content">
+                        <h2>{service.title}</h2>
+                        <p>{service.description}</p>
+                        <ul className="service-features">
+                          {service.features.map((feature, index) => (
+                            <li key={index}>{feature}</li>
+                          ))}
+                        </ul>
+                      </div>
+                      <button className={`service-btn ${service.btnClass}`}>
+                        {service.btnText}
+                        <span className="arrow">→</span>
+                      </button>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="no-results">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                  <h3>No services found</h3>
+                  <p>Try searching with different keywords like "tax" or "RC"</p>
+                  <button 
+                    className="clear-filters-btn"
+                    onClick={() => setSearchTerm('')}
+                  >
+                    Clear Search
+                  </button>
                 </div>
-                <div className="card-content">
-                  <h2>Apply for Duplicate RC</h2>
-                  <p>Get a duplicate registration certificate for your vehicle</p>
-                  <ul className="service-features">
-                    <li>✓ Easy application process</li>
-                    <li>✓ Home delivery available</li>
-                    <li>✓ Track application status</li>
-                    <li>✓ Secure payment gateway</li>
-                  </ul>
-                </div>
-                <button className="service-btn rc-btn">
-                  Apply for Duplicate RC
-                  <span className="arrow">→</span>
-                </button>
-              </div>
+              )}
             </div>
 
             <div className="back-section">

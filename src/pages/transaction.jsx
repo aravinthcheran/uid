@@ -170,6 +170,15 @@ function TransactionStatus({ onNavigate }) {
                   </button>
                 </div>
               </div>
+              
+              <div className="back-section">
+                <button 
+                  className="back-to-home-btn"
+                  onClick={() => onNavigate('home')}
+                >
+                  ← Back to Home
+                </button>
+              </div>
             </div>
           </div>
         </section>

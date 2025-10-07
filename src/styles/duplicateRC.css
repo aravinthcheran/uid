@@ -72,6 +72,25 @@
   box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
 }
 
+.prefilled-input {
+  background-color: #f0f8ff;
+  border-color: #4caf50;
+  cursor: not-allowed;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.prefilled-note {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  font-size: 0.875rem;
+  color: #4caf50;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
 .verify-btn,
 .order-rc-btn {
   width: 100%;
@@ -98,6 +117,31 @@
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
+}
+
+.back-to-services-btn {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #1e3c72;
+  border-radius: 8px;
+  background-color: white;
+  color: #1e3c72;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: none;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.back-to-services-btn:hover {
+  background-color: #f5f5f5;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 60, 114, 0.15);
 }
 
 .info-section {

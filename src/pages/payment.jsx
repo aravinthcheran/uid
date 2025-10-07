@@ -247,7 +247,32 @@ function Payment({ onNavigate, paymentDetails = {} }) {
 
   const handleSuccessClose = () => {
     setShowSuccess(false);
-    onNavigate('services');
+    
+    // Save transaction to localStorage
+    if (transactionDetails) {
+      const transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+      const newTransaction = {
+        id: transactionDetails.transactionId,
+        date: new Date().toISOString(),
+        serviceType: transactionDetails.serviceType,
+        vehicleNumber: transactionDetails.vehicleNumber || 'N/A',
+        amount: transactionDetails.amount,
+        status: 'Success',
+        paymentMethod: transactionDetails.paymentMethod,
+        timestamp: Date.now()
+      };
+      transactions.unshift(newTransaction); // Add to beginning
+      // Keep only last 20 transactions
+      if (transactions.length > 20) {
+        transactions.splice(20);
+      }
+      localStorage.setItem('transactions', JSON.stringify(transactions));
+    }
+    
+    onNavigate('services', { 
+      vehicleNumber: paymentDetails.vehicleNumber || '',
+      showTransactionSuccess: true 
+    });
   };
 
   const handleDownloadReceipt = () => {

@@ -261,49 +261,6 @@ function App({ onNavigate }) {
             </button>
           </div>
         </section>
-
-        {/* Services Section */}
-        <section id="services" className="services-section">
-          <h3>Popular Services</h3>
-          <div className="services-grid">
-            <div className="service-item">
-              <ServiceIcon><CarIcon /></ServiceIcon>
-              <span>Vehicle Registration</span>
-            </div>
-            <div className="service-item">
-              <ServiceIcon><PermitIcon /></ServiceIcon>
-              <span>Permit</span>
-            </div>
-            <div className="service-item">
-              <ServiceIcon><FitnessIcon /></ServiceIcon>
-              <span>Fitness</span>
-            </div>
-            <div 
-              className="service-item"
-              onClick={() => onNavigate('tax')}
-              style={{ cursor: 'pointer' }}
-            >
-              <ServiceIcon><TaxIcon /></ServiceIcon>
-              <span>Tax</span>
-            </div>
-            <div className="service-item">
-              <ServiceIcon><PuccIcon /></ServiceIcon>
-              <span>PUCC</span>
-            </div>
-            <div className="service-item">
-              <ServiceIcon><FancyNumberIcon /></ServiceIcon>
-              <span>Fancy Number</span>
-            </div>
-             <div className="service-item">
-              <ServiceIcon><KnowVehicleIcon /></ServiceIcon>
-              <span>Know Your Vehicle</span>
-            </div>
-            <div className="service-item">
-              <ServiceIcon><OtherServicesIcon /></ServiceIcon>
-              <span>Other Services</span>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
